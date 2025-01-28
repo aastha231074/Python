@@ -50,3 +50,5 @@ st.write(iris.target_names[prediction])
 
 st.subheader('Pridiction Probability')
 st.write(pridiction_proba)
+
+# streamlit run 2_practice.py 
