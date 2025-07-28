@@ -55,3 +55,14 @@ async def update_book(book_title):
         if BOOKS[i].get('title').casefold() == book_title.casefold():
             BOOKS.pop(i)
             break
+
+# --------- ASSIGNMENT 1 ----------
+# Get all books from a specific author using path or query parameters
+# Path Parameter 
+@app.get("/books/byauthor/{author}")
+async def read_books_by_author_path(author: str):
+    books_to_return = []
+    for book in BOOKS:
+        if book.get('author').casefold() == author.casefold() :
+            books_to_return.append(book)
+    return books_to_return
