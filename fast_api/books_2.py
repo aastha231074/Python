@@ -1,7 +1,7 @@
 # --------TO RUN--------
 # uvicorn books_2:app --reload -> click on the links -> change the url = {url}/docs (for swagger UI)
 from typing import Optional
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Path 
 from pydantic import BaseModel, Field
 
 app = FastAPI()
@@ -56,7 +56,7 @@ async def read_all_books():
     return BOOKS
 
 @app.get("/books/{book_id}")
-async def read_book(book_id: int):
+async def read_book(book_id: int = Path(gt=0)):
     for book in BOOKS:
         if book.id == book_id:
             return book
@@ -77,12 +77,6 @@ async def read_books_by_publish_date(published_date: int):
             books_to_return.append(book)
     return books_to_return
 
-# Without data validation 
-# @app.post("/create-book")
-# async def create_book(book_request=Body()):
-#     BOOKS.append(book_request)
-
-# With data validation 
 @app.post("/create-book")
 async def create_book(book_request: BookRequest):
     # dict is deprecated 
@@ -106,7 +100,7 @@ async def update_book(book: BookRequest):
             BOOKS[i] = book
 
 @app.delete("/books/{book_id}")
-async def delete_book(book_id: int):
+async def delete_book(book_id: int = Path(gt=0)):
     for i in range(len(BOOKS)):
         if BOOKS[i].id == book_id:
             BOOKS.pop(i)
