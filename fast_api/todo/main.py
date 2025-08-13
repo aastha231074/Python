@@ -1,8 +1,12 @@
 # --------TO RUN--------
 # uvicorn books_2:app --reload -> click on the links -> change the url = {url}/docs (for swagger UI)
-from fastapi import FastAPI
+from typing import Annotated
+from sqlalchemy.orm import Session
+
+from fastapi import FastAPI, Depends
 import models
-from database import engine
+from models import Todos
+from database import engine, SessionLocal
 
 app = FastAPI()
 
@@ -13,3 +17,18 @@ app = FastAPI()
 # bind=engine -> This specifies which database engine to use. The engine is a SQLAlchemy Engine object that represents the connection to your specific database 
 # ---------------------------------------------------
 models.Base.metadata.create_all(bind=engine)
+
+# Before each request we are able to fetch the DB session local, 
+# i.e. open up connection and close a connection on every request sent to the fastAPI application 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally: 
+        db.close()
+
+db_dependency = Annotated[Session, Depends(get_db)]
+
+@app.get("/")
+async def read_all(db: db_dependency):
+    return db.query(Todos).all()
