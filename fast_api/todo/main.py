@@ -9,6 +9,7 @@ from starlette import status
 import models
 from models import Todos
 from database import engine, SessionLocal
+from router import auth
 
 app = FastAPI()
 
@@ -19,6 +20,8 @@ app = FastAPI()
 # bind=engine -> This specifies which database engine to use. The engine is a SQLAlchemy Engine object that represents the connection to your specific database 
 # ---------------------------------------------------
 models.Base.metadata.create_all(bind=engine)
+
+app.include_router(auth.router)
 
 # Before each request we are able to fetch the DB session local, 
 # i.e. open up connection and close a connection on every request sent to the fastAPI application 
