@@ -136,3 +136,73 @@ async def delete_book(book_title: str):
             break
 ```
 
+
+## Improving
+
+### Data Validation:
+
+```python 
+from fastapi import FastAPI, Body
+from pydantic import BaseModel, Field
+```
+
+#### What is Pydantics? 
+- Python library that is used for data modeling, data parsing and has efficient error handling
+- Pydantics is commonly used as a resource for data validation and how to handle data coming to our FastAPI application
+
+```python 
+# Before data validation 
+@app.post("/books/create_book")
+async def create_book(new_book=Body()):
+    BOOKS.append(new_book)
+
+# 1. If we pass any non valid entry like the rating of the book to -1000 or 1000 then it would accept it without any error 
+# 2. We have 6 books in our list with id 1 to 6 now if we add a new book to the list then we want the id to be 7, no check for that 
+# 3. We can pass anything in the book tile or description even an empty string 
+
+# After data validation 
+
+class Book:
+    id: int
+    title: str
+    author: str
+    description: str
+    rating: int
+    published_date: int
+
+    def __init__(self, id, title, author, description, rating, published_date):
+        self.id = id
+        self.title = title
+        self.author = author
+        self.description = description 
+        self.rating = rating 
+        self.published_date = published_date
+
+class BookRequest(BaseModel):
+    id: Optional[int] = Field(description='ID is not needed on create', default=None)
+    title: str = Field(min_length = 3)
+    author: str = Field(min_length = 1)
+    description: str = Field(min_length = 1, max_length = 100)
+    rating: int = Field(gt = -1, lt = 6)
+    published_date: int = Field(gt=1999, lt=2031)
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "title": "A new book",
+                "author": "codingwithaastha",
+                "description": "A new description of a book",
+                "rating": 5,
+                "published_date": 2025
+            }
+        }
+    }
+
+@app.post("/create-book", status_code=status.HTTP_201_CREATED)
+async def create_book(book_request: BookRequest):
+    # dict is deprecated 
+    # new_book = Book(**book_request.dict())
+    new_book = Book(**book_request.model_dump())
+    BOOKS.append(find_book_id(new_book))
+
+```
