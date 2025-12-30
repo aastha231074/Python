@@ -142,8 +142,9 @@ async def delete_book(book_title: str):
 ### Data Validation:
 
 ```python 
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Body, Path, Query
 from pydantic import BaseModel, Field
+from starlette import status
 ```
 
 #### What is Pydantics? 
@@ -209,4 +210,144 @@ def find_book_id(book: Book):
     book.id = 1 if len(BOOKS) == 0 else BOOKS[-1].id + 1
     return book
 
+```
+
+#### Path parameter data validation
+```python 
+# Before Data Validation 
+@app.get("/books/{book_id}")
+async def read_book(book_id: int):
+    for book in BOOKS:
+        if book.id == book_id:
+            return book 
+
+# 1. The user can pass negative book_id as well no error 
+# 2. If the book_id is not present we are not returning anything 
+
+# After Data Validation 
+@app.get("/books/{book_id}")
+async def read_book(book_id: int = Path(gt=0)):
+    for book in BOOKS:
+        if book.id == book_id:
+            return book 
+```
+
+#### Query parameter data validation
+```python 
+# Before Data Validation 
+@app.get("/books/")
+async def read_book_by_rating(book_rating: int):
+    books_to_return = []
+    for book in BOOKS:
+        if book.rating == book_rating:
+            books_to_return.append(book)
+    return books_to_return
+
+# 1. The rating is between 1-5 also defined in the bookRequest class
+
+# After Data Validation 
+@app.get("/books/")
+async def read_book_by_rating(book_rating: int = Query(gt=0,lt=6)):
+    books_to_return = []
+    for book in BOOKS:
+        if book.rating == book_rating:
+            books_to_return.append(book)
+    return books_to_return
+```
+
+#### Status Codes
+##### What are status codes? 
+- An HTTP Status Code is used to help the Client ( the user or system submitting data to the server ) to understand what happened on the server side application. 
+
+- Status Codes are international standards on how a Client/Server should handle the result of a request 
+
+- It allows everyone who sends a request to know their submission was successful or not
+
+##### 🔢 Status Code Series Overview
+
+| Status Code Series | Name            | Meaning |
+|--------------------|-----------------|---------|
+| **1xx**            | Informational   | Request received, continuing process |
+| **2xx**            | Success         | Request successfully processed |
+| **3xx**            | Redirection     | Further action needed to complete request |
+| **4xx**            | Client Error    | Error caused by invalid client request |
+| **5xx**            | Server Error    | Error occurred on the server |
+
+---
+
+##### ✅ 1xx – Informational Responses
+
+| Code | Name | Description |
+|------|------|-------------|
+| 100 | Continue | Request received, client may continue |
+| 101 | Switching Protocols | Server is switching protocols |
+
+---
+
+##### 🎉 2xx – Success Responses
+
+| Code | Name | Description |
+|------|------|-------------|
+| 200 | OK | Request successful |
+| 201 | Created | Resource successfully created |
+| 202 | Accepted | Request accepted for processing |
+| 204 | No Content | Request successful, no response body |
+
+---
+
+##### 🔁 3xx – Redirection Messages
+
+| Code | Name | Description |
+|------|------|-------------|
+| 301 | Moved Permanently | Resource permanently moved |
+| 302 | Found | Temporary redirect |
+| 303 | See Other | Redirect using GET |
+| 304 | Not Modified | Cached version is valid |
+| 307 | Temporary Redirect | Temporary redirect (same method) |
+| 308 | Permanent Redirect | Permanent redirect (same method) |
+
+---
+
+##### ❌ 4xx – Client Error Responses
+
+| Code | Name | Description |
+|------|------|-------------|
+| 400 | Bad Request | Invalid request syntax |
+| 401 | Unauthorized | Authentication required |
+| 403 | Forbidden | Access denied |
+| 404 | Not Found | Resource not found |
+| 405 | Method Not Allowed | HTTP method not supported |
+| 409 | Conflict | Request conflicts with current state |
+| 422 | Unprocessable Entity | Validation error |
+| 429 | Too Many Requests | Rate limit exceeded |
+
+---
+
+##### 💥 5xx – Server Error Responses
+
+| Code | Name | Description |
+|------|------|-------------|
+| 500 | Internal Server Error | Generic server error |
+| 502 | Bad Gateway | Invalid upstream response |
+| 503 | Service Unavailable | Server temporarily unavailable |
+| 504 | Gateway Timeout | Upstream server timeout |
+
+#### HTTP Exception
+
+```python 
+@app.get("/books/{book_id}")
+async def read_book(book_id: int = Path(gt=0)):
+    for book in BOOKS:
+        if book.id == book_id:
+            return book
+    raise HTTPException(status_code=404, detail='Item not found')
+```
+
+```python
+@app.post("/create-book", status_code=status.HTTP_201_CREATED)
+async def create_book(book_request: BookRequest):
+    # dict is deprecated 
+    # new_book = Book(**book_request.dict())
+    new_book = Book(**book_request.model_dump())
+    BOOKS.append(find_book_id(new_book))
 ```
