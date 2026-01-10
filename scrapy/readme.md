@@ -165,10 +165,131 @@ Use Scrapy if:
 - Code needs to be **maintainable**
 - Data feeds into **pipelines or dashboards**
 
-#  
+# 🕷️ Scrapy Project Guide
 
-Commands: 
+A practical guide to getting started with **Scrapy**, testing selectors, building real spiders, and understanding when to choose Scrapy vs Selenium.
 
-```bash 
+---
+
+## 🚀 Creating a New Scrapy Project
+
+```bash
 scrapy startproject <project_name>
+
+<project_name>/
+├── scrapy.cfg
+└── <project_name>/
+    ├── __init__.py
+    ├── items.py
+    ├── middlewares.py
+    ├── pipelines.py
+    ├── settings.py
+    └── spiders/
+        └── __init__.py
+```
+
+## 🕸️ Creating a Spider
+Navigate to the spiders directory and run:
+```bash
+scrapy genspider <spider_name> <website_url>
+```
+Example:
+```bash
+scrapy genspider quotes quotes.toscrape.com
+```
+This generates a spider inside:
+```bash
+<project_name>/spiders/quotes.py
+```
+
+## ▶️ Running a Spider
+From the project root:
+
+```bash
+scrapy crawl <spider_name>
+```
+Save output to a file:
+
+```bash
+scrapy crawl <spider_name> -O output.json
+```
+Supported formats: json, csv, jl, xml
+
+## 🧪 Scrapy Shell (Selector Testing & Debugging)
+### 1️⃣ Install IPython
+```bash
+pip install ipython
+```
+### 2️⃣ Enable IPython in scrapy.cfg
+```
+[settings]
+shell = ipython
+```
+
+### 3️⃣ Start the Shell
+
+```bash
+scrapy shell
+```
+#### 🔍 Using Scrapy Shell
+```python
+# Fetch a URL
+fetch("https://example.com")
+# Response Object
+response
+# 🎯 CSS Selector Examples
+response.css("div.quote")
+# Get first match:
+response.css("div.quote").get()
+# Get all matches:
+response.css("div.quote").getall()
+# Extract text:
+response.css("span.text::text").get()
+# Extract attribute:
+response.css("a::attr(href)").get()
+
+# 🧭 XPath Selector Examples
+
+# Basic XPath:
+response.xpath("//div[@class='quote']")
+# Get text:
+response.xpath("//span[@class='text']/text()").get()
+# Get all texts:
+response.xpath("//span[@class='text']/text()").getall()
+# Get attribute:
+response.xpath("//a/@href").get()
+# Using contains:
+response.xpath("//div[contains(@class,'quote')]")
+# Relative XPath:
+response.xpath(".//span/text()").get()
+```
+
+### 🧑‍💻 Real Scrapy Spider Example
+
+Example spider that crawls quotes.toscrape.com
+```python
+import scrapy
+
+class QuotesSpider(scrapy.Spider):
+    name = "quotes"
+    start_urls = [
+        "https://quotes.toscrape.com/"
+    ]
+
+    def parse(self, response):
+        for quote in response.css("div.quote"):
+            yield {
+                "text": quote.css("span.text::text").get(),
+                "author": quote.css("small.author::text").get(),
+                "tags": quote.css("div.tags a.tag::text").getall(),
+            }
+
+        # pagination
+        next_page = response.css("li.next a::attr(href)").get()
+        if next_page:
+            yield response.follow(next_page, callback=self.parse)
+```
+Run:
+```bash
+scrapy crawl quotes -O quotes.json
 ```
