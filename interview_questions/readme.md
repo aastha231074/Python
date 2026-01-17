@@ -154,4 +154,58 @@ print(u._User__salary)  # Name mangling
 > **Interview one-liner:**
 > Python uses naming conventions rather than strict access modifiers.
 
+## 5. Python Classes: 
 
+### What is a class? 
+A class is a blueprint. Not the actual thing - just the design of the thing 
+
+Example:
+- 🏠 Blueprint → shows rooms, doors, windows
+- 🏠 House → actual building
+
+In Python:
+- Class → blueprint
+- Object → actual thing created from it
+
+> Interview : 
+> A class is a blueprint that defines the structure and behavior of objects, and an object is an instance created from that class.
+
+### Key Terms: 
+| Term | Meaning | 
+|------|---------|
+|Class | Blueprint| 
+|Object / Instance | Real things created from class | 
+|Attribute | Data stored in object | 
+|Method | Function that belongs to class | 
+|```self```| Reference to current object | 
+
+👉 Variables = data </br>
+👉 Functions = actions</br>
+👉 Classes = data + actions bundled together</br>
+
+### What is ```self``` and why does it exist?
+Think of ```self``` as "the current object" 
+
+When you write: 
+```python 
+class Cookie: 
+    def __init__(self,color):
+        self.color = color
+```
+and then create object like 
+```python
+c1 = Cookie("red")
+c2 = Cookie("blue")
+```
+Python automatically translate this behind the scenes: 
+```python
+Cookie.__init__(c1, "red")
+Cookie.__init__(c2,"blue")
+```
+So: 
+- ```self``` -> ```c1``` (first object)
+- ```self``` -> ```c2``` (second object)
+
+👉 self is just a reference to which object is calling the method.
+
+Without self, Python wouldn’t know whether it’s dealing with c1, c2, or any other object.
