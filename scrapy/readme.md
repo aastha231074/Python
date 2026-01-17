@@ -293,3 +293,7 @@ Run:
 ```bash
 scrapy crawl quotes -O quotes.json
 ```
+
+```bash
+scrapy crawl quotes -O quotes.csv
+```
