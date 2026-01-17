@@ -1,70 +1,157 @@
-# Python Interview Questions 
+# Python Interview Questions
 
-## 1. What is the difference between a Module and a Package? 
-| Feature  | Module  | Package  |   
-|---|---|---|
-|   Definition | A module is a single Python file that contains code like functions, classes and valriables.  |  A package is a collection of modules organised in a directory |   
-| Example  | `math_operations.py`  | `mypackages/` with `__init__.py` , `math_operations.py`, `string_operations.py` |   
-| Import example  | import math_operations.py  |  from mypackage import math_operations |   
+---
 
-## 2. Is Python a compiled language or an interpreted language? 
-- <b>Compiled language</b> is a programming lanuage where human-read-able code is translated ahead of time by a compiler into low level machine code ( binary ) that a computer's CPU can execute directly. e.g. C, C++, Rust, Go
+## 1. What is the difference between a Module and a Package?
 
-- <b> Interpreted language </b> translate line by line at runtime 
+| Feature | Module | Package |
+|------|------|------|
+| **Definition** | A module is a single Python file containing functions, classes, or variables. | A package is a collection of related modules organized inside a directory. |
+| **Example** | `math_operations.py` | `mypackage/` containing `__init__.py`, `math_operations.py`, `string_operations.py` |
+| **Import example** | `import math_operations` | `from mypackage import math_operations` |
 
-    Python is generally considered an interpreted language, but the reality it's actaully a both compiled and interpreted
+> **Interview tip:**  
+> Every package is a module, but not every module is a package.
 
-    ### How Python Works? 
-    1. Compilation Step: When you run a Python program, the source code (`.py` files) is first compiled into bytecode ( `.pyc` file stored in `__pycache__`). This bytecode is a lower-level, platform-intependent representation of your code.
-    2. Interpretation Step: The byte code is then executed by the Python Virtual Machine, which interprets it line by line. 
+---
 
-    ### What is Python Virtual Machine?
-    The Pyton Virtual Machine is the runtime engine that actually executes Python bytecode.
-    1. You write python code (`.py` file)
-    2. Python compiler converts it to bytecode (`.pyc` file)
-    3. PVM reads and executes the bytecode instruction by instruction 
+## 2. Is Python a compiled language or an interpreted language?
 
-    #### What the PVM does:
-    The PVM is essentially an interpreter loop that:
+Python is **both compiled and interpreted**.
 
-    - Reads bytecode instructions one at a time
-    - Performs the corresponding operations (like adding numbers, calling functions, managing memory)
-    - Maintains the runtime environment (stack, namespace, memory)
-    - Handles Python's dynamic features (duck typing, dynamic binding)
+### Definitions
 
+- **Compiled language**  
+  A programming language where human-readable code is translated ahead of time into machine code.  
+  Examples: C, C++, Rust, Go
 
-    ### What is byte code?
-    Byte Code is an intermediate low level representaion of your code that sits between human-readable source code and machine code.  
-    #### Why bytecode exists:
-    Python source code is too high-level for computers to execute directly, but compiling all the way to machine code would make Python lose its portability and dynamic features. Bytecode is the compromise—it's:
+- **Interpreted language**  
+  Code is executed line by line at runtime.
 
-    - Faster to execute than parsing source code repeatedly
-    - Platform-independent (works on any OS with Python installed)
-    - Compact (smaller than source code)
-    
-    ```python 
-        x = 5 + 3
-        ```
-        **Bytecode (human-readable form):**
-        ```
-        LOAD_CONST    0 (5)
-        LOAD_CONST    1 (3)
-        BINARY_ADD
-        STORE_NAME    0 (x)
-    ```
+---
 
+### How Python Works
 
+1. **Compilation Step**  
+   Python source code (`.py`) is compiled into **bytecode** (`.pyc`) and stored in the `__pycache__` directory.
+2. **Interpretation Step**  
+   The bytecode is executed by the **Python Virtual Machine (PVM)**.
 
-## 3. What are the benefits of using Python language as a tool in the present scenario? 
-1. Simplicity 
-2. Versality 
-3. Extensive libraries and framework
-4. Strong community support 
+---
+
+### What is the Python Virtual Machine (PVM)?
+
+The PVM is the runtime engine that executes Python bytecode.
+
+**Execution flow:**
+1. You write Python code (`.py`)
+2. Python compiler converts it to bytecode (`.pyc`)
+3. PVM executes the bytecode instruction by instruction
+
+---
+
+### What the PVM does
+
+- Reads bytecode instructions
+- Executes operations (arithmetic, function calls, memory handling)
+- Manages runtime environment (stack, namespaces, heap)
+- Supports dynamic features (duck typing, dynamic binding)
+
+---
+
+### What is Bytecode?
+
+Bytecode is an **intermediate, low-level, platform-independent** representation of Python code.
+
+#### Why bytecode exists
+
+- Faster than parsing source code repeatedly
+- Platform independent
+- Compact and optimized for execution
+
+Example:
+
+```python
+x = 5 + 3
+
+Bytecode (human-readable form):
+
+LOAD_CONST    0 (5)
+LOAD_CONST    1 (3)
+BINARY_ADD
+STORE_NAME    0 (x)
+```
+> **Interview tip:**  
+> Python compiles source code into bytecode and then interprets it using the PVM.
+
+## 3. What are the benefits of using Python in the present scenario?
+1. Simplicity and readability
+2. Versatility (web development, ML, data science, automation, DevOps)
+3. Extensive libraries and frameworks
+4. Strong community support
 5. Portability
-6. Development Speed 
-7. Dynamic Typing 
-8. Open Source 
+6. Fast development speed
+7. Dynamic typing
+8. Open source
 
-## 4. What are global, protected and private attributes in Python? 
-- <b> Global </b> variables are public variables defined 
+> **Interview tip:**  
+> Python prioritizes developer productivity over raw execution speed.
+
+## 4. What are global, protected, and private attributes in Python?
+Python does not enforce access control strictly. These are naming conventions, not true access modifiers.
+
+### 1. Global (Public) Attributes
+Accessible from anywhere
+
+No underscore prefix
+
+```python
+class User:
+    name = "Aastha"
+
+print(User.name)
+```
+
+### 2. Protected Attributes (_variable)
+Intended for internal use within a class or its subclasses
+
+Still accessible outside the class (convention only)
+
+```python
+class User:
+    def __init__(self):
+        self._age = 23
+
+class Admin(User):
+    def show_age(self):
+        print(self._age)
+```
+
+### 3. Private Attributes (__variable)
+Name-mangled by Python to prevent accidental access
+
+Not accessible directly outside the class
+
+```python
+class User:
+    def __init__(self):
+        self.__salary = 50000
+
+
+u = User()
+# print(u.__salary)   # AttributeError
+print(u._User__salary)  # Name mangling
+```
+
+
+### Summary Table
+| Type |Prefix|	Accessibility |
+|------|------|------|
+|Public	|variable	|Anywhere|
+|Protected	|_variable	|Class & subclasses (convention)|
+|Private	|__variable	|Class only (name mangling)|
+
+> **Interview one-liner:**
+> Python uses naming conventions rather than strict access modifiers.
+
 
